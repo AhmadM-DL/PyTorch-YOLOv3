@@ -331,6 +331,10 @@ def plot_rescaled_boxes_on_image(img, bboxes, model_input_size):
     fig, ax = plt.subplots(1)
     ax.imshow(img)
 
+    # Create Colors
+    cmap = plt.get_cmap("tab20b")
+    colors = [cmap(i) for i in np.linspace(0, 1, 20)]
+
     # Draw bounding boxes and labels of detections
     if bboxes is not None:
 
