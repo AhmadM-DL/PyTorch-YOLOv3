@@ -293,14 +293,17 @@ def build_targets(pred_boxes, pred_cls, target, anchors, ignore_thres):
     target_boxes = target[:, 2:6] * nG
     gxy = target_boxes[:, :2]
     gwh = target_boxes[:, 2:]
+
     # Get anchors with best iou
     ious = torch.stack([bbox_wh_iou(anchor, gwh) for anchor in anchors])
     best_ious, best_n = ious.max(0)
+
     # Separate target values
     b, target_labels = target[:, :2].long().t()
     gx, gy = gxy.t()
     gw, gh = gwh.t()
     gi, gj = gxy.long().t()
+    
     # Set masks
     obj_mask[b, best_n, gj, gi] = 1
     noobj_mask[b, best_n, gj, gi] = 0
@@ -312,11 +315,14 @@ def build_targets(pred_boxes, pred_cls, target, anchors, ignore_thres):
     # Coordinates
     tx[b, best_n, gj, gi] = gx - gx.floor()
     ty[b, best_n, gj, gi] = gy - gy.floor()
+    
     # Width and height
     tw[b, best_n, gj, gi] = torch.log(gw / anchors[best_n][:, 0] + 1e-16)
     th[b, best_n, gj, gi] = torch.log(gh / anchors[best_n][:, 1] + 1e-16)
+    
     # One-hot encoding of label
     tcls[b, best_n, gj, gi, target_labels] = 1
+    
     # Compute label correctness and iou at best anchor
     class_mask[b, best_n, gj, gi] = (pred_cls[b, best_n, gj, gi].argmax(-1) == target_labels).float()
     iou_scores[b, best_n, gj, gi] = bbox_iou(pred_boxes[b, best_n, gj, gi], target_boxes, x1y1x2y2=False)
@@ -328,7 +334,7 @@ def plot_rescaled_boxes_on_image(img, bboxes, classes, model_input_size):
 
     # Create plot
     plt.figure()
-    fig, ax = plt.subplots(1)
+    _, ax = plt.subplots(1)
     ax.imshow(img)
 
     # Create Colors
@@ -353,10 +359,13 @@ def plot_rescaled_boxes_on_image(img, bboxes, classes, model_input_size):
             box_h = y2 - y1
 
             color = bbox_colors[int(np.where(unique_labels == int(cls_pred))[0])]
+
             # Create a Rectangle patch
             bbox = patches.Rectangle((x1, y1), box_w, box_h, linewidth=2, edgecolor=color, facecolor="none")
+
             # Add the bbox to the plot
             ax.add_patch(bbox)
+
             # Add label
             plt.text(
                 x1,
