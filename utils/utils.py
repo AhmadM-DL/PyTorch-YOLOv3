@@ -324,7 +324,7 @@ def build_targets(pred_boxes, pred_cls, target, anchors, ignore_thres):
     tconf = obj_mask.float()
     return iou_scores, class_mask, obj_mask, noobj_mask, tx, ty, tw, th, tcls, tconf
 
-def plot_rescaled_boxes_on_image(img, bboxes, model_input_size):
+def plot_rescaled_boxes_on_image(img, bboxes, classes, model_input_size):
 
     # Create plot
     plt.figure()
@@ -367,7 +367,6 @@ def plot_rescaled_boxes_on_image(img, bboxes, model_input_size):
                 bbox={"color": color, "pad": 0},
             )
 
-    # Save generated image with detections
     plt.axis("off")
     plt.gca().xaxis.set_major_locator(NullLocator())
     plt.gca().yaxis.set_major_locator(NullLocator())
