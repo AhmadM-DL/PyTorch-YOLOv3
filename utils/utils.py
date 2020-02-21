@@ -9,6 +9,10 @@ from torch.autograd import Variable
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+import random
+from matplotlib.ticker import NullLocator
+from PIL import Image
+
 
 
 def to_cpu(tensor):
@@ -319,3 +323,48 @@ def build_targets(pred_boxes, pred_cls, target, anchors, ignore_thres):
 
     tconf = obj_mask.float()
     return iou_scores, class_mask, obj_mask, noobj_mask, tx, ty, tw, th, tcls, tconf
+
+def plot_rescaled_boxes_on_image(img:np.array_type, bboxes, model_input_size):
+
+    # Create plot
+    plt.figure()
+    fig, ax = plt.subplots(1)
+    ax.imshow(img)
+
+    # Draw bounding boxes and labels of detections
+    if bboxes is not None:
+
+        # Rescale boxes to original image
+        if not model_input_size == img.shape[:2]:
+            detections = rescale_boxes(bboxes, model_input_size, img.shape[:2])
+
+        unique_labels = detections[:, -1].cpu().unique()
+        n_cls_preds = len(unique_labels)
+        bbox_colors = random.sample(colors, n_cls_preds)
+        for x1, y1, x2, y2, conf, cls_conf, cls_pred in detections:
+
+            print("\t+ Label: %s, Conf: %.5f" % (classes[int(cls_pred)], cls_conf.item()))
+
+            box_w = x2 - x1
+            box_h = y2 - y1
+
+            color = bbox_colors[int(np.where(unique_labels == int(cls_pred))[0])]
+            # Create a Rectangle patch
+            bbox = patches.Rectangle((x1, y1), box_w, box_h, linewidth=2, edgecolor=color, facecolor="none")
+            # Add the bbox to the plot
+            ax.add_patch(bbox)
+            # Add label
+            plt.text(
+                x1,
+                y1,
+                s=classes[int(cls_pred)],
+                color="white",
+                verticalalignment="top",
+                bbox={"color": color, "pad": 0},
+            )
+
+    # Save generated image with detections
+    plt.axis("off")
+    plt.gca().xaxis.set_major_locator(NullLocator())
+    plt.gca().yaxis.set_major_locator(NullLocator())
+
