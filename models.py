@@ -396,7 +396,7 @@ def evaluate(model, path, iou_thres, conf_thres, nms_thres, img_size, batch_size
     return precision, recall, AP, f1, ap_class
 
 def train(model_cfg, model_weights, data_cfg, img_size, 
-          epochs=100, batch_size=8, gradient_ccumulations=2,
+          epochs=100, batch_size=8, gradient_accumulations=2,
           checkpoint_interval=5, evaluation_interval=5,
           compute_map=False, multiscale_training=True,
           n_cpu=8):
