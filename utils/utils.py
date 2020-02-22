@@ -380,3 +380,64 @@ def plot_rescaled_boxes_on_image(img, bboxes, classes, model_input_size):
     plt.gca().xaxis.set_major_locator(NullLocator())
     plt.gca().yaxis.set_major_locator(NullLocator())
 
+def generate_yolo_train_test_files(images_dir, output_dir, classes, train_valid_split=0.8):
+    
+    train_output = output_dir+"/train.txt"
+    valid_output = output_dir+"/valid.txt"
+    data_output = output_dir+"/obj.data"
+    names_output = output_dir+"/obj.names"
+    backup_path = output_dir+"/backup"
+
+    images = [ f for f in os.listdir(images_dir) if re.match(".*.jpg$",f)]
+    train = np.random.choice(images, size=int(len(images)*train_valid_split) )
+    valid = set(images) - set(train)
+
+    # Write train.txt
+    f_train = open(train_output, "w")
+    for image_name in train:
+        f_train.write(images_dir+"/"+image_name+"\n")
+    f_train.close()
+
+    # Write valid.txt
+    f_valid = open(valid_output, "w")
+    for image_name in valid:
+        f_valid.write(images_dir+"/"+image_name+"\n")
+    f_train.close()
+
+    # create backup
+    os.makedirs(backup_path)
+
+    # Write obj.names
+    f_names = open(names_output, "w")
+    for class_name in classes:
+        f_names.write(class_name+"\n")
+    f_names.close()
+
+    f_data = open(data_output, "w")
+    f_data.write("classes="+str(len(classes))+"\n")
+    f_data.write("train="+train_output+"\n")
+    f_data.write("valid="+valid_output+"\n")
+    f_data.write("names="+names_output+"\n")
+    f_data.write("backup="+backup_path+"\n")
+    f_data.close()
+
+
+def replace_class_yolo_format(original_class, replace_class, images_labels_dir, image_label_file_regex=".*.txt$"):
+    for file in os.listdir(images_labels_dir):
+        if re.match(pattern=image_label_file_regex, string=file):
+            # open file
+            f = open(os.path.join(images_labels_dir, file), "r")
+            file_content = f.read().split("\n")[:-1]
+            f.close()
+            file_output_content = []
+            for line in file_content:
+                bbox = line.split(" ")
+                if int(bbox[0]) == original_class:
+                    bbox[0] = str(replace_class)
+                file_output_content.append(" ".join(bbox))
+            f = open(os.path.join(images_labels_dir, file), "w")
+            f.write("\n".join(file_output_content))
+            f.close()
+        else:
+            continue
+
