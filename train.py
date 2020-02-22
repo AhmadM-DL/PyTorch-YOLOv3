@@ -5,7 +5,6 @@ from utils.logger import *
 from utils.utils import *
 from utils.datasets import *
 from utils.parse_config import *
-from test import evaluate
 
 from terminaltables import AsciiTable
 
@@ -21,6 +20,9 @@ from torchvision import datasets
 from torchvision import transforms
 from torch.autograd import Variable
 import torch.optim as optim
+
+from test import evaluate
+
 
 
 def train(model_cfg, model_weights, data_cfg, img_size, 
