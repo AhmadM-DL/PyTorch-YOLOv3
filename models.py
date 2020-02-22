@@ -9,6 +9,7 @@ from torchvision import datasets
 from torchvision import transforms
 import torch.optim as optim
 
+
 import numpy as np
 
 import matplotlib.pyplot as plt
@@ -407,7 +408,7 @@ def train(model_cfg, model_weights, data_cfg, img_size,
     os.makedirs("checkpoints", exist_ok=True)
 
     # Get data configuration
-    data_config = parse_data_config(data_cfg)
+    data_cfg = parse_data_config(data_cfg)
     train_path = data_cfg["train"]
     valid_path = data_cfg["valid"]
     class_names = load_classes(data_cfg["names"])
