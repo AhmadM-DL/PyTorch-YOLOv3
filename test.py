@@ -21,7 +21,6 @@ import torch.optim as optim
 
 
 def evaluate(model, path, iou_thres, conf_thres, nms_thres, img_size, batch_size):
-    
     model.eval()
 
     # Get dataloader
