@@ -1,7 +1,7 @@
 from __future__ import division
 import math
 import time
-import tqdm\
+import tqdm
 import os
 import re
 import torch
