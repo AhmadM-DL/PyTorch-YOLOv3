@@ -459,7 +459,7 @@ def train(model_cfg, model_weights, data_cfg, img_size,
 
             loss.backward()
 
-            if batches_done % opt.gradient_accumulations:
+            if batches_done % gradient_accumulations:
                 # Accumulates gradient before each step
                 optimizer.step()
                 optimizer.zero_grad()
