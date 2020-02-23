@@ -467,7 +467,7 @@ def normalize_cvat_labels(images_labels_dir, image_label_file_regex=".*.txt$"):
                     for bbox in bboxes:
                         file_output_content.append(" ".join( class_+ list(bbox) ) )
 
-                else # We have one bbox
+                else: # We have one bbox
 
                     file_output_content.append(" ".join(data))
 
