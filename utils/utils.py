@@ -425,8 +425,6 @@ def generate_yolo_train_test_files(images_dir, output_dir, classes, train_valid_
 
 
 def replace_class_yolo_format(original_class, replace_class, images_labels_dir, image_label_file_regex=".*.txt$"):
-    empty_imgs = 0
-    all_imgs = 0
     for file in os.listdir(images_labels_dir):
         if re.match(pattern=image_label_file_regex, string=file):
             all_imgs+=1
@@ -436,13 +434,9 @@ def replace_class_yolo_format(original_class, replace_class, images_labels_dir, 
             file_content = f.read().split("\n")
             f.close()
 
-            if file_content==[]:
-                empty_imgs+=1
-                continue
-
             file_output_content = []
             for line in file_content:
-                
+
                 if line == "":
                     continue
 
@@ -451,11 +445,11 @@ def replace_class_yolo_format(original_class, replace_class, images_labels_dir, 
                     bbox[0] = str(replace_class)
                 file_output_content.append(" ".join(bbox))
             f = open(os.path.join(images_labels_dir, file), "w")
-            f.write("\n".join(file_output_content))
+            f.write("\n".join(file_output_content)+"\n")
             f.close()
         else:
             continue
-    return all_imgs, empty_imgs
+    
 
 def normalize_cvat_labels(images_labels_dir, image_label_file_regex=".*.txt$"):
 
