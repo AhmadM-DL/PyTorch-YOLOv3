@@ -450,6 +450,7 @@ def replace_class_yolo_format(original_class, replace_class, images_labels_dir, 
             f.close()
         else:
             continue
+    return all_imgs, empty_imgs
 
 def normalize_cvat_labels(images_labels_dir, image_label_file_regex=".*.txt$"):
 
