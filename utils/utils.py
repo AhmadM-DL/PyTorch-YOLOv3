@@ -335,8 +335,7 @@ def build_targets(pred_boxes, pred_cls, target, anchors, ignore_thres):
 def plot_rescaled_boxes_on_image(img, bboxes, classes, model_input_size, verbose=0, **kwargs):
 
     # Create plot
-    plt.figure(figsize=kwargs.get("figsize", (8,8)))
-    _, ax = plt.subplots(1)
+    _, ax = plt.subplots(1, figsize=kwargs.get("figsize", (8,8)))
     ax.imshow(img)
 
     # Create Colors
