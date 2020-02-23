@@ -332,10 +332,10 @@ def build_targets(pred_boxes, pred_cls, target, anchors, ignore_thres):
     tconf = obj_mask.float()
     return iou_scores, class_mask, obj_mask, noobj_mask, tx, ty, tw, th, tcls, tconf
 
-def plot_rescaled_boxes_on_image(img, bboxes, classes, model_input_size):
+def plot_rescaled_boxes_on_image(img, bboxes, classes, model_input_size, verbose=0, **kwargs):
 
     # Create plot
-    plt.figure()
+    plt.figure(figsize=kwargs.get("figsize", (8,8)))
     _, ax = plt.subplots(1)
     ax.imshow(img)
 
@@ -355,7 +355,8 @@ def plot_rescaled_boxes_on_image(img, bboxes, classes, model_input_size):
         bbox_colors = random.sample(colors, n_cls_preds)
         for x1, y1, x2, y2, conf, cls_conf, cls_pred in detections:
 
-            print("\t+ Label: %s, Conf: %.5f" % (classes[int(cls_pred)], cls_conf.item()))
+            if verbose:
+                print("\t+ Label: %s, Conf: %.5f" % (classes[int(cls_pred)], cls_conf.item()))
 
             box_w = x2 - x1
             box_h = y2 - y1
