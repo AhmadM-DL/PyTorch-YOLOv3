@@ -443,3 +443,40 @@ def replace_class_yolo_format(original_class, replace_class, images_labels_dir, 
         else:
             continue
 
+def normalize_cvat_labels(images_labels_dir, image_label_file_regex=".*.txt$"):
+
+    lines_changed = 0 
+
+        for file in os.listdir(images_labels_dir):
+
+            if re.match(pattern=image_label_file_regex, string=file):
+
+                # open file
+                f = open(os.path.join(images_labels_dir, file), "r")
+                file_content = f.read().split("\n")[:-1]
+                f.close()
+
+                file_output_content = []
+                for line in file_content:
+                    data = line.split(" ")
+
+                    if (len(data)>5): # we have multiple bbox of same class as in cvat
+                        lines_changed+=1
+                        class_ = data[0]
+                        bboxes = np.array(data[1:]).reshape( (-1,4) )
+                        for bbox in bboxes:
+                            file_output_content.append(" ".join( class_+ list(bbox) ) )
+
+                    else # We have one bbox
+
+                        file_output_content.append(" ".join(data))
+
+                f = open(os.path.join(images_labels_dir, file), "w")
+                f.write("\n".join(file_output_content))
+                f.close()
+            else:
+                continue
+
+    return lines_changed
+    
+
