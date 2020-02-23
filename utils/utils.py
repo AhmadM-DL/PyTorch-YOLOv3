@@ -433,14 +433,19 @@ def replace_class_yolo_format(original_class, replace_class, images_labels_dir, 
 
             # open file
             f = open(os.path.join(images_labels_dir, file), "r")
-            file_content = f.read().split("\n")[:-1]
+            file_content = f.read().split("\n")
             f.close()
+
             if file_content==[]:
                 empty_imgs+=1
                 continue
 
             file_output_content = []
             for line in file_content:
+                
+                if line == "":
+                    continue
+
                 bbox = line.split(" ")
                 if int(bbox[0]) == original_class:
                     bbox[0] = str(replace_class)
