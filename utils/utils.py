@@ -348,7 +348,8 @@ def plot_rescaled_boxes_on_image(img, bboxes, classes, model_input_size, verbose
         # Rescale boxes to original image
         if not model_input_size == img.shape[:2]:
             detections = rescale_boxes(bboxes, model_input_size, img.shape[:2])
-
+        else:
+            detections = bboxes
         unique_labels = detections[:, -1].cpu().unique()
         n_cls_preds = len(unique_labels)
         bbox_colors = random.sample(colors, n_cls_preds)
