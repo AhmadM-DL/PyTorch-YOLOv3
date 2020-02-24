@@ -335,7 +335,7 @@ def build_targets(pred_boxes, pred_cls, target, anchors, ignore_thres):
 def plot_rescaled_boxes_on_image(img, bboxes, classes, model_input_size, verbose=0, **kwargs):
 
     # Create plot
-    _, ax = plt.subplots(1, figsize=kwargs.get("figsize", (8,8)))
+    fig, ax = plt.subplots(1, figsize=kwargs.get("figsize", (8,8)))
     ax.imshow(img)
 
     # Create Colors
@@ -381,6 +381,7 @@ def plot_rescaled_boxes_on_image(img, bboxes, classes, model_input_size, verbose
     plt.axis("off")
     plt.gca().xaxis.set_major_locator(NullLocator())
     plt.gca().yaxis.set_major_locator(NullLocator())
+    return fig
 
 def generate_yolo_train_test_files(images_dir, output_dir, classes, train_valid_split=0.8):
 
