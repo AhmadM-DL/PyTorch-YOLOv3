@@ -347,7 +347,7 @@ def plot_rescaled_boxes_on_image(img, bboxes, classes, model_input_size, verbose
 
         # Rescale boxes to original image
         if not model_input_size == img.shape[:2]:
-            detections = rescale_boxes(bboxes, model_input_size, img.shape[:2])
+            detections = rescale_boxes(bboxes, model_input_size(0), img.shape[:2])
         else:
             detections = bboxes
         unique_labels = detections[:, -1].cpu().unique()
@@ -490,8 +490,8 @@ def normalize_cvat_labels(images_labels_dir, image_label_file_regex=".*.txt$"):
     return lines_changed
 
 def prepare_image_yolo(img, model_img_size, pad_value=0):
+
     """
-    
     """
     c, h, w = img.shape
     dim_diff = np.abs(h - w)
