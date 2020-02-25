@@ -503,7 +503,7 @@ def prepare_image_yolo(img, model_img_size, pad_value=0):
     # Add padding
     img = F.pad(img, pad, "constant", value=pad_value)
 
-    img = F.interpolate(img.unsqueeze(0), size=model_input_img_size, mode="nearest").squeeze(0)
+    img = F.interpolate(img.unsqueeze(0), size=model_img_size, mode="nearest").squeeze(0)
 
     return img
 
