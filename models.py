@@ -396,10 +396,12 @@ def evaluate(model, path, iou_thres, conf_thres, nms_thres, img_size, batch_size
 
     return precision, recall, AP, f1, ap_class
 
+
 def train(model_cfg, model_weights, data_cfg, img_size, 
           epochs=100, batch_size=8, gradient_accumulations=2,
           checkpoint_interval=5, evaluation_interval=5,
           compute_map=False, multiscale_training=True,
+          freeze_model_to=0,
           n_cpu=8):
     
     logger = Logger("logs")
@@ -423,6 +425,9 @@ def train(model_cfg, model_weights, data_cfg, img_size,
             model.load_state_dict(torch.load(model_weights))
         else:
             model.load_darknet_weights(model_weights)
+
+    if freeze_model_to:
+        freeze_model_until_layer(model, freeze_model_to)
     
     # Get dataloader
     dataset = ListDataset(train_path, augment=True, multiscale=multiscale_training)
@@ -531,3 +536,10 @@ def train(model_cfg, model_weights, data_cfg, img_size,
         if epoch % checkpoint_interval == 0:
             torch.save(model.state_dict(), f"checkpoints/yolov3_ckpt_%d.pth" % epoch)
 
+
+def freeze_model_until_layer(model, freeze_until_layer):
+    for i, module in enumerate(list(model.module_list)):
+        if i > freeze_until_layer:
+            break
+        for param in module.parameters():
+                param.requires_grad = False
