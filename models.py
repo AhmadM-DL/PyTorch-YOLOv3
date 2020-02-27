@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 from utils.logger import *
-from utils.utils import *oad
+from utils.utils import *
 from utils.datasets import *
 from utils.parse_config import *
 
