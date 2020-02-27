@@ -336,7 +336,7 @@ def plot_rescaled_boxes_on_image(img, bboxes, classes, model_input_size, verbose
 
     # Create plot
     fig, ax = plt.subplots(1, figsize=kwargs.get("figsize", (8,8)))
-    ax.imshow(img)
+    ax.imshow(img, aspect="auto")
 
     # Create Colors
     cmap = plt.get_cmap("tab20b")
