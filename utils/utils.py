@@ -15,6 +15,7 @@ import random
 from matplotlib.ticker import NullLocator
 from PIL import Image
 import copy
+import cv2
 
 
 
@@ -410,22 +411,18 @@ def cv2_put_text(img, text, text_offset_x, text_offset_y, background_color=(255,
 def annotate_image_with_objects(original_img, objects_bboxes, classes_names, model_input_size, only_classes=None, confidence_threshold= 0, plot_labels=True, plot_class_confidence=False, text_color=(255,255,255)):
     """
     """
-    masked_frame = copy.copy(original_frame)
-
     # Rescale boxes to original image
     if not (model_input_size, model_input_size) == masked_frame.shape[:2]:
-        detections = rescale_boxes(objects_bboxes, model_input_size, masked_frame.shape[:2])
-    else:
-        detections = objects_bboxes
+        objects_bboxes = rescale_boxes(objects_bboxes, model_input_size, masked_frame.shape[:2])
 
     # Create Colors
     cmap = plt.get_cmap("tab20b")
     colors = [cmap(i) for i in np.linspace(0, 1, 20)]
-    unique_labels = detections[:, -1].cpu().unique()
+    unique_labels = objects_bboxes[:, -1].cpu().unique()
     n_cls_preds = len(unique_labels)
     bbox_colors = random.sample(colors, n_cls_preds)
 
-    for x1, y1, x2, y2, conf, cls_conf, cls_id in detections.cpu().data.numpy():
+    for x1, y1, x2, y2, conf, cls_conf, cls_id in objects_bboxes.cpu().data.numpy():
         x1 = int(x1)
         x2 = int(x2)
         y1 = int(y1)
@@ -434,7 +431,7 @@ def annotate_image_with_objects(original_img, objects_bboxes, classes_names, mod
         cls_conf = float(cls_conf)
         cls_id = int(cls_id)
 
-        if only_classes and not class_names[cls_id] in only_classes:
+        if only_classes and not classes_names[cls_id] in only_classes:
             continue
 
         if cls_conf<confidence_threshold:
