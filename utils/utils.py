@@ -461,7 +461,7 @@ def annotate_frame_with_objects(original_frame, objects_bboxes, class_names, mod
 
         cv2.rectangle( masked_frame, (x1, y1), ( x2, y2),
                       color = bb_color,
-                      thickness=  np.min(original_frame.shape[:2]))
+                      thickness=  thickness))
 
         if plot_labels:
             # Define x and y offsets for the labels
