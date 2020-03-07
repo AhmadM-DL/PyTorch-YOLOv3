@@ -410,7 +410,7 @@ def cv2_put_text(img, text, text_offset_x, text_offset_y, background_color=(255,
 def annotate_image_with_objects(original_img, objects_bboxes, classes_names, model_input_size, only_classes=None, confidence_threshold= 0, plot_labels=True, plot_class_confidence=False, text_color=(255,255,255)):
     """
     """
-       masked_frame = copy.copy(original_frame)
+    masked_frame = copy.copy(original_frame)
 
     # Rescale boxes to original image
     if not (model_input_size, model_input_size) == masked_frame.shape[:2]:
