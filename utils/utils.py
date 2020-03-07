@@ -14,6 +14,7 @@ import matplotlib.patches as patches
 import random
 from matplotlib.ticker import NullLocator
 from PIL import Image
+import copy
 
 
 
@@ -383,6 +384,96 @@ def plot_rescaled_boxes_on_image(img, bboxes, classes, model_input_size, verbose
     plt.gca().xaxis.set_major_locator(NullLocator())
     plt.gca().yaxis.set_major_locator(NullLocator())
     return fig
+
+def cv2_put_text(img, text, text_offset_x, text_offset_y, background_color=(255, 255, 255), text_color=(255, 255, 255)):
+    """
+    A Function to write text on an image using openCV
+    :param img: The image to write text on it
+    :param text: The text to be written
+    :param text_offset_x: The text bbox upper left point abscissa
+    :param text_offset_y: The text bbox upper left point ordinate
+    :param background_color: The text bbox background color
+    :param text_color: The text color
+    :return: Nothing
+    """
+    font_scale = 0.35
+    font = cv2.FONT_HERSHEY_SIMPLEX
+
+    # get the width and height of the text box
+    (text_width, text_height) = cv2.getTextSize(text, font, fontScale=font_scale, thickness=1)[0]
+
+    # make the coords of the box with a small padding of two pixels
+    box_coords = ((text_offset_x, text_offset_y), (text_offset_x + text_width + 2, text_offset_y - text_height - 2))
+    cv2.rectangle(img, box_coords[0], box_coords[1], background_color, cv2.FILLED)
+    cv2.putText(img, text, (text_offset_x, text_offset_y), font, fontScale=font_scale, color=text_color, thickness=1)
+
+def annotate_frame_with_objects(original_frame, objects_bboxes, class_names, model_input_size,  only_classes=None, confidence_threshold= 0, plot_labels=True, plot_class_confidence=False, text_color=(255,255,255)):
+    """
+    This function plots detected objects bounding boxes over images with class name and accuracy
+    :param original_frame: A Frame(Image) from video
+    :param objects_bboxes: Detected Objects Bounding boxes (output of yolo object detection model) and their class
+    :param class_names: Array of class names
+    :param only_classes: A list of class names to consider, if none consider all
+    :param confidence_threshold:
+    :param plot_labels: Whether to write down class label over bounding boxes or not
+    :param plot_class_confidence: Whether to write down class confidence over bounding boxes or not
+    :return: Masked Frame
+    """
+    masked_frame = copy.copy(original_frame)
+
+    # Rescale boxes to original image
+    if not (model_input_size, model_input_size) == masked_frame.shape[:2]:
+        detections = rescale_boxes(objects_bboxes, model_input_size, masked_frame.shape[:2])
+    else:
+        detections = objects_bboxes
+
+    # Create Colors
+    cmap = plt.get_cmap("tab20b")
+    colors = [cmap(i) for i in np.linspace(0, 1, 20)]
+    unique_labels = detections[:, -1].cpu().unique()
+    n_cls_preds = len(unique_labels)
+    bbox_colors = random.sample(colors, n_cls_preds)
+
+    for x1, y1, x2, y2, conf, cls_conf, cls_id in detections.cpu().data.numpy():
+        x1 = int(x1)
+        x2 = int(x2)
+        y1 = int(y1)
+        y2 = int(y2)
+        conf = float(conf)
+        cls_conf = float(cls_conf)
+        cls_id = int(cls_id)
+
+        if only_classes and not class_names[cls_id] in only_classes:
+            continue
+
+        if cls_conf<confidence_threshold:
+            continue
+
+        # Calculate the width and height of the bounding box relative to the size of the image.
+        box_w = x2 - x1
+        box_h = y2 - y1
+
+        # get color
+        bb_color = bbox_colors[int(np.where(unique_labels == int(cls_id))[0])]
+        bb_color =  tuple([ int(ch*255) for ch in bb_color])[:3]
+
+        cv2.rectangle( masked_frame, (x1, y1), ( x2, y2),
+                      color = bb_color,
+                      thickness= 1)
+
+        if plot_labels:
+            # Define x and y offsets for the labels
+            lxc = (masked_frame.shape[1] * 0.266) / 100
+            lyc = (masked_frame.shape[0] * 1.180) / 100
+
+            # Plot class name
+            cv2_put_text(masked_frame, class_names[cls_id], x1, y1-1, background_color=bb_color, text_color=text_color)
+
+        if plot_class_confidence:
+            # Plot probability
+            cv2_put_text(masked_frame, "{0:.2f}".format(cls_conf), x1, y2, background_color=bb_color, text_color=text_color)
+
+    return masked_frame
 
 def generate_yolo_train_test_files(images_dir, output_dir, classes, train_valid_split=0.8):
 
